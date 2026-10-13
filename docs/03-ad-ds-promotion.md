@@ -42,7 +42,9 @@ AD stores the location of domain controllers as **SRV records** in DNS. Installi
 
 ## Verification
 
-After restart, log in as `OFFICE\Administrator`.
+After restart, log in as `OFFICE\Administrator` (the first restart can take 5–10 minutes).
+
+> **Important:** Use `OFFICE\Administrator` for all further server work. A local account created during installation (in this lab, *Christoffer*) becomes an ordinary domain user after promotion. It can log in, but it is **not** a member of *Enterprise Admins* and cannot authorize DHCP (see [Troubleshooting #2](10-troubleshooting-log.md)).
 
 ```powershell
 Get-ADDomain | Select-Object DNSRoot, NetBIOSName, PDCEmulator
@@ -50,8 +52,9 @@ Get-ADDomainController | Select-Object Name, IPv4Address, IsGlobalCatalog
 dcdiag /q          # No output = no errors
 ```
 
-- [ ] Login as `OFFICE\Administrator` works
-- [ ] `Get-ADDomain` shows `office.lab`
+- [x] Promotion reported *Operation completed successfully* (the two yellow DNS delegation warnings are expected)
+- [x] Login as `OFFICE\Administrator` works
+- [x] Server Manager shows Domain: `office.lab`
 - [ ] `dcdiag /q` reports no errors
 
 > 📸 **Take a VMware snapshot:** `DC01 – domain controller`

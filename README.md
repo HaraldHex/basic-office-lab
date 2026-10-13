@@ -12,7 +12,7 @@ A hands-on homelab simulating a small company network: one domain controller and
 
 | Area | Technologies |
 |---|---|
-| Virtualization | VMware Workstation, custom virtual network (VMnet2, NAT) |
+| Virtualization | VMware Workstation, NAT network (VMnet8) with VMware DHCP disabled |
 | Identity | Active Directory Domain Services (AD DS) |
 | Name resolution | DNS (forward and reverse zones, forwarders, SRV records) |
 | Addressing | DHCP (scope, options, AD authorization) |
@@ -25,11 +25,11 @@ A hands-on homelab simulating a small company network: one domain controller and
 
 | Role | Hostname | OS | IP |
 |---|---|---|---|
-| Domain Controller (AD DS, DNS, DHCP, File) | **DC01** | Windows Server | 10.10.10.10 (static) |
-| Client – IT | **PC-IT01** | Windows 11 Pro | DHCP |
-| Client – Finance | **PC-FIN01** | Windows 11 Pro | DHCP |
-| Client – Sales | **PC-SALES01** | Windows 11 Pro | DHCP |
-| Client – HR | **PC-HR01** | Windows 11 Pro | DHCP |
+| Domain Controller (AD DS, DNS, DHCP, File) | **DC01** | Windows Server 2025 Datacenter | 10.10.10.10 (static) |
+| Client – IT | **PC-IT01** | Windows 11 Enterprise | DHCP |
+| Client – Finance | **PC-FIN01** | Windows 11 Enterprise | DHCP |
+| Client – Sales | **PC-SALES01** | Windows 11 Enterprise | DHCP |
+| Client – HR | **PC-HR01** | Windows 11 Enterprise | DHCP |
 
 | Setting | Value |
 |---|---|
@@ -54,19 +54,32 @@ Client gets IP from DHCP → receives DC01 as DNS → finds the domain via SRV r
 
 | # | Phase | Status |
 |---|---|---|
-| 00 | [Planning](docs/00-planning.md) | ⬜ |
-| 01 | [VMware networking](docs/01-vmware-networking.md) | ⬜ |
-| 02 | [Server installation](docs/02-server-installation.md) | ⬜ |
-| 03 | [AD DS and domain controller promotion](docs/03-ad-ds-promotion.md) | ⬜ |
-| 04 | [DNS](docs/04-dns.md) | ⬜ |
-| 05 | [DHCP](docs/05-dhcp.md) | ⬜ |
-| 06 | [OUs, users and groups](docs/06-ous-users-groups.md) | ⬜ |
-| 07 | [Joining clients to the domain](docs/07-domain-join.md) | ⬜ |
+| 00 | [Planning](docs/00-planning.md) | ✅ |
+| 01 | [VMware networking](docs/01-vmware-networking.md) | ✅ |
+| 02 | [Server installation](docs/02-server-installation.md) | ✅ |
+| 03 | [AD DS and domain controller promotion](docs/03-ad-ds-promotion.md) | ✅ |
+| 04 | [DNS](docs/04-dns.md) | ✅ |
+| 05 | [DHCP](docs/05-dhcp.md) | ✅ |
+| 06 | [OUs, users and groups](docs/06-ous-users-groups.md) | ✅ |
+| 07 | [Joining clients to the domain](docs/07-domain-join.md) | ✅ |
 | 08 | [Group Policy](docs/08-group-policy.md) | ⬜ |
 | 09 | [File server and permissions](docs/09-file-server.md) | ⬜ |
-| 10 | [Troubleshooting log](docs/10-troubleshooting-log.md) | ⬜ |
+| 10 | [Troubleshooting log](docs/10-troubleshooting-log.md) | 🔄 5 issues logged |
 
 *Replace ⬜ with ✅ as each phase is completed.*
+
+## Users
+
+| User | Department | Group | Workstation |
+|---|---|---|---|
+| ola.nordmann | IT | GG_IT | PC-IT01 |
+| per.johansen | Finance | GG_Finance | PC-FIN01 |
+| lars.larsen | Sales | GG_Sales | PC-SALES01 |
+| emma.berg | HR | GG_HR | PC-HR01 |
+
+## Highlights from troubleshooting
+
+Five real issues were hit and solved during the build, including a misconfigured virtual subnet, a DHCP authorization permission error and a keyboard-layout conflict with VMware. Each is documented with symptom, investigation, root cause and fix in the [troubleshooting log](docs/10-troubleshooting-log.md).
 
 ## Scripts
 

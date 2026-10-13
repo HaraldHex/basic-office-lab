@@ -23,6 +23,8 @@ Install-WindowsFeature DHCP -IncludeManagementTools
 ### 2. Authorize DHCP in Active Directory
 **Why:** A domain-joined DHCP server won't hand out addresses until it's authorized. This prevents rogue DHCP servers on the network.
 
+> **Requires Enterprise Admins.** Run this as `OFFICE\Administrator`. Running it as an ordinary admin account fails with *PermissionDenied* (see [Troubleshooting #2](10-troubleshooting-log.md)). Check with `whoami` first.
+
 ```powershell
 Add-DhcpServerInDC -DnsName "dc01.office.lab" -IPAddress 10.10.10.10
 
@@ -61,9 +63,10 @@ Get-DhcpServerv4OptionValue -ScopeId 10.10.10.0
 
 On a client (once installed): `ipconfig /all` should show an address in the .100–.200 range and **DNS Servers: 10.10.10.10**.
 
-- [ ] DHCP authorized (green arrows in the DHCP console)
-- [ ] Scope active
-- [ ] Options 003, 006 and 015 set
+- [x] `Get-DhcpServerInDC` lists `10.10.10.10  dc01.office.lab`
+- [x] Scope *Office LAN* is Active (10.10.10.100 – 10.10.10.200, 8-day lease)
+- [x] Options 003, 006 and 015 set
+- [x] First client (PC-IT01) received 10.10.10.100, gateway 10.10.10.2, DNS suffix office.lab
 
 ## Screenshots to take
 

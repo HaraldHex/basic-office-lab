@@ -46,7 +46,7 @@ All names are **15 characters or fewer** (NetBIOS limit).
 ```mermaid
 flowchart TB
     INET((Internet)) --- NAT[VMware NAT gateway<br/>10.10.10.2]
-    NAT --- SW[VMnet2 – 10.10.10.0/24]
+    NAT --- SW[VMnet8 NAT – 10.10.10.0/24]
     SW --- DC[DC01<br/>10.10.10.10<br/>AD DS · DNS · DHCP · File]
     SW --- C1[PC-IT01]
     SW --- C2[PC-FIN01]
@@ -60,6 +60,8 @@ flowchart TB
 |---|---|---|---|
 | DC01 | 2 | 4 GB | 60 GB |
 | Each client | 2 | 4 GB | 64 GB |
+
+> **Plan vs reality:** The lab ended up on VMnet8 (VMware's NAT network) instead of a custom VMnet2, because VMware Workstation allows only one NAT network. Clients run Windows 11 Enterprise Evaluation; DC01 runs Windows Server 2025 Datacenter Evaluation.
 
 Host RAM needed with all VMs running: ~20 GB. With 16 GB, reduce clients to 2–3 GB or run two clients at a time.
 

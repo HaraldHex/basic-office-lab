@@ -47,10 +47,10 @@ Resolve-DnsName microsoft.com       # Public IP → forwarders work
 nslookup 10.10.10.10                # dc01.office.lab → reverse zone works
 ```
 
-- [ ] Forwarders configured
-- [ ] Reverse zone exists
-- [ ] SRV record for DC01 found
-- [ ] Internet names resolve
+- [x] Forwarders configured
+- [x] Reverse zone exists
+- [x] SRV record found: `svr hostname = dc01.office.lab`, port 389
+- [x] Internet names resolve (`microsoft.com` returned A and AAAA records)
 
 ## Screenshots to take
 
