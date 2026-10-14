@@ -115,13 +115,6 @@ basic-office-lab/
 └── scripts/         PowerShell automation
 ```
 
-## What I learned
-
-*Fill in when the lab is finished. 3–5 concrete takeaways, for example:*
-
-- 
-- 
-- 
 
 ## Next steps
 
