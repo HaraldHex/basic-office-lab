@@ -17,7 +17,8 @@ A hands-on homelab simulating a small company network: one domain controller and
 | Name resolution | DNS (forward and reverse zones, forwarders, SRV records) |
 | Addressing | DHCP (scope, options, AD authorization) |
 | Structure | Organizational Units, users and security groups per department |
-| Management | Group Policy (password policy, mapped drives, desktop wallpaper) |
+| Security | Password & lockout policy, tiered admin accounts, Protected Users, Windows LAPS, hardening GPO, audit policy |
+| Compliance | PowerShell compliance report (PASS/WARN/FAIL) with remediation cycle |
 | File services | SMB shares with Share and NTFS permissions |
 | Automation | PowerShell scripts for OUs and bulk user creation |
 
@@ -62,9 +63,9 @@ Client gets IP from DHCP → receives DC01 as DNS → finds the domain via SRV r
 | 05 | [DHCP](docs/05-dhcp.md) | ✅ |
 | 06 | [OUs, users and groups](docs/06-ous-users-groups.md) | ✅ |
 | 07 | [Joining clients to the domain](docs/07-domain-join.md) | ✅ |
-| 08 | [Group Policy](docs/08-group-policy.md) | ⬜ |
+| 08 | [Security hardening & compliance](docs/08-group-policy.md) | ✅ (1 open item) |
 | 09 | [File server and permissions](docs/09-file-server.md) | ⬜ |
-| 10 | [Troubleshooting log](docs/10-troubleshooting-log.md) | 🔄 7 issues logged |
+| 10 | [Troubleshooting log](docs/10-troubleshooting-log.md) | 🔄 11 issues logged |
 
 *Replace ⬜ with ✅ as each phase is completed.*
 
@@ -78,10 +79,22 @@ All four workstations are joined to `office.lab` and placed in the Workstations 
 | per.johansen | Finance | GG_Finance | PC-FIN01 |
 | lars.larsen | Sales | GG_Sales | PC-SALES01 |
 | emma.berg | HR | GG_HR | PC-HR01 |
+| adm.christoffer | IT (admin) | Domain Admins, Protected Users | – |
+
+## Security & compliance
+
+| Control | Result |
+|---|---|
+| Password policy | 12+ characters, lockout after 5 attempts (default was *never*) |
+| Admin accounts | Named `adm.` account in Protected Users; only 2 Domain Admins |
+| Windows LAPS | Unique, rotating local admin password per PC |
+| Hardening GPO | Screen lock, firewall forced on, USB blocked, LLMNR off, logon banner |
+| Auditing | Account creation, deletion and lockouts logged (Event 4720/4726/4740) |
+| Compliance report | First run **68 %**, findings remediated and re-measured |
 
 ## Highlights from troubleshooting
 
-Seven real issues were hit and solved during the build, including a misconfigured virtual subnet, a DHCP authorization permission error and a keyboard-layout conflict with VMware. Each is documented with symptom, investigation, root cause and fix in the [troubleshooting log](docs/10-troubleshooting-log.md).
+Eleven real issues were hit during the build, including a misconfigured virtual subnet, a DHCP authorization permission error, missing LAPS permissions and a Group Policy precedence conflict. Each is documented with symptom, investigation, root cause and fix in the [troubleshooting log](docs/10-troubleshooting-log.md).
 
 ## Scripts
 
@@ -89,6 +102,7 @@ Seven real issues were hit and solved during the build, including a misconfigure
 |---|---|
 | [`New-LabOUs.ps1`](scripts/New-LabOUs.ps1) | Creates the OU structure and department security groups |
 | [`New-LabUsers.ps1`](scripts/New-LabUsers.ps1) | Bulk-creates users from [`users.csv`](scripts/users.csv) |
+| [`Get-ComplianceReport.ps1`](scripts/Get-ComplianceReport.ps1) | Read-only AD compliance check with HTML report (PASS/WARN/FAIL) |
 
 ## Repository structure
 
@@ -101,11 +115,21 @@ basic-office-lab/
 └── scripts/         PowerShell automation
 ```
 
+## What I learned
+
+*Fill in when the lab is finished. 3–5 concrete takeaways, for example:*
+
+- 
+- 
+- 
+
 ## Next steps
 
 - [ ] Add a second domain controller (DC02) for redundancy
 - [ ] Move file services to a dedicated member server (FS01)
 - [ ] Implement AGDLP group strategy for share permissions
+- [ ] Close the audit-policy remediation item
+- [ ] Schedule the compliance report weekly
 - [ ] Add Windows Server Update Services (WSUS)
 
 ---

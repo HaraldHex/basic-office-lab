@@ -72,6 +72,34 @@ Use this template for each issue:
 - **Fix:** Joined with PowerShell instead, pasting the command from the host so the backslash came through correctly: `Add-Computer -DomainName "office.lab" -NewName "PC-HR01" -Credential "OFFICE\Administrator" -Restart`.
 - **Lesson learned:** Rule out the network first (`nslookup`). If DNS works, a join error is almost always about credentials or naming.
 
+### Issue #8: Pasted commands arrived with the wrong characters
+- **Phase:** 08 – Security hardening
+- **Symptom:** Pasted commands arrived as `Invoke+LapsPolicyProcessing`, `"` became `Æ`, `|` became `*`, and `gpupdate /force` printed the help text.
+- **Root cause:** The client had no VMware Tools, so VMware typed the clipboard as **US** keystrokes into a VM using a **Norwegian** layout. Every symbol landed on the wrong key.
+- **Fix:** Switched the VM to English (US) with **Win + Space** before pasting. Permanent fix: install VMware Tools on every client.
+- **Lesson learned:** When output looks "almost right", compare characters. A consistent substitution pattern points to a keyboard-layout mismatch.
+
+### Issue #9: LAPS – "machine has not been granted permission"
+- **Phase:** 08 – Security hardening (LAPS)
+- **Symptom:** `Invoke-LapsPolicyProcessing` on the clients: *The request failed because the machine has not been granted permission in Active Directory to backup the managed account password.* The compliance report showed LAPS FAIL for all four PCs.
+- **Root cause:** Computers in `OU=Workstations` had no permission to write their own LAPS password attributes. `Set-LapsADComputerSelfPermission` had not taken effect.
+- **Fix:** Ran `Set-LapsADComputerSelfPermission -Identity "OU=Workstations,OU=Computers,OU=OFFICE,DC=office,DC=lab"` on DC01, then `Invoke-LapsPolicyProcessing` on each client.
+- **Lesson learned:** LAPS needs three parts: schema, OU permission and GPO. The compliance report caught the missing permission that a manual check had missed.
+
+### Issue #10: Audit policy only logs Success on DC01 (open)
+- **Phase:** 08 – Security hardening (auditing)
+- **Symptom:** The compliance report flagged *User Account Management: Success* (Failure missing).
+- **Investigation:** `gpresult /h` on DC01 listed only *Security Settings* and no *Advanced Audit Configuration* section. The effective audit settings came from the Default Domain Controllers Policy.
+- **Root cause:** (1) The advanced audit subcategories were not saved in `GPO_Audit_Baseline`. (2) GPO precedence (**LSDOU**): DC01 is in `OU=Domain Controllers`, and an OU-linked GPO overrides a domain-linked one.
+- **Planned fix:** Configure the subcategories in `GPO_Audit_Baseline`, link it to `OU=Domain Controllers` with `-Order 1`, then verify with `auditpol /get /subcategory:"User Account Management"`.
+- **Lesson learned:** "My GPO doesn't work" is usually about precedence or an empty GPO. `gpresult /h` shows the **winning GPO** for each setting.
+
+### Issue #11: Commands run in the wrong context
+- **Phase:** 08 – Security hardening
+- **Symptoms:** AD cmdlets "not recognized" (run on the physical host `HEX`); *Insufficient access rights* (logged in as `office\christoffer`); *Access Denied* from `gpresult` (window not elevated); `gpresult` showing no workstation GPOs (run on DC01 instead of PC-IT01).
+- **Fix:** Check context before running anything: `hostname`, `whoami`, and that the window title starts with **Administrator:**.
+- **Lesson learned:** Three questions before every admin command: *which machine, which account, elevated or not?*
+
 ---
 
 ## Common pitfalls (reference)
