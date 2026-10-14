@@ -35,6 +35,8 @@ nslookup office.lab    # Answered by DC01.office.lab
 
 Result on PC-IT01: **10.10.10.100**, gateway **10.10.10.2**, DNS suffix **office.lab**. This proves DC01's DHCP is working.
 
+> **Name the local account something generic** (e.g. `localadmin`). Don't give it the same name as the computer (`PC-SALES01`): a user and a computer with the same name cause conflicts when renaming and joining. See [Troubleshooting #6](10-troubleshooting-log.md).
+
 ### 3. Rename and join the domain (GUI)
 
 1. **Windows key + R** → `sysdm.cpl` → **Enter**
@@ -44,7 +46,13 @@ Result on PC-IT01: **10.10.10.100**, gateway **10.10.10.2**, DNS suffix **office
 5. Credentials: username `Administrator` and the domain password
 6. *"Welcome to the office.lab domain"* → **OK** → restart
 
-**Why the GUI here:** The PowerShell alternative (`Add-Computer -Credential OFFICE\Administrator`) needs `\` or `@`, which require AltGr on a Norwegian keyboard. VMware intercepts AltGr (see [Troubleshooting #3](10-troubleshooting-log.md)).
+**PowerShell alternative** (once VMware Tools is installed, so the line can be pasted):
+
+```powershell
+Add-Computer -DomainName "office.lab" -NewName "PC-HR01" -Credential "OFFICE\Administrator" -Restart
+```
+
+**Why the GUI first:** The PowerShell alternative (`Add-Computer -Credential OFFICE\Administrator`) needs `\` or `@`, which require AltGr on a Norwegian keyboard. VMware intercepts AltGr (see [Troubleshooting #3](10-troubleshooting-log.md)).
 
 ### 4. Log in as a domain user
 At the login screen: **Other user**. Check that it says **Sign in to: OFFICE**, then type the username without a prefix, e.g. `ola.nordmann`.
@@ -65,9 +73,21 @@ Get-ADComputer -Filter * | Select-Object Name, DistinguishedName
 | Client | User | Joined | Domain login tested |
 |---|---|---|---|
 | PC-IT01 | ola.nordmann | ✅ | ✅ |
-| PC-FIN01 | per.johansen | ⬜ | ⬜ |
-| PC-SALES01 | lars.larsen | ⬜ | ⬜ |
-| PC-HR01 | emma.berg | ⬜ | ⬜ |
+| PC-FIN01 | per.johansen | ✅ | ✅ |
+| PC-SALES01 | lars.larsen | ✅ | ✅ |
+| PC-HR01 | emma.berg | ✅ | ✅ |
+
+All four clients landed in `OU=Workstations` automatically thanks to `redircmp` (phase 06). Only PC-IT01 had to be moved by hand, because it joined before the redirect was set.
+
+```text
+Name       DistinguishedName
+----       -----------------
+DC01       CN=DC01,OU=Domain Controllers,DC=office,DC=lab
+PC-IT01    CN=PC-IT01,OU=Workstations,OU=Computers,OU=OFFICE,DC=office,DC=lab
+PC-FIN01   CN=PC-FIN01,OU=Workstations,OU=Computers,OU=OFFICE,DC=office,DC=lab
+PC-SALES01 CN=PC-SALES01,OU=Workstations,OU=Computers,OU=OFFICE,DC=office,DC=lab
+PC-HR01    CN=PC-HR01,OU=Workstations,OU=Computers,OU=OFFICE,DC=office,DC=lab
+```
 
 ## Least privilege
 
@@ -79,7 +99,8 @@ When Ola Nordmann opens PowerShell, the title bar says just *Windows PowerShell*
 - [ ] "Welcome to the office.lab domain"
 - [ ] `Get-CimInstance Win32_ComputerSystem` showing Domain office.lab
 - [ ] Start menu / `whoami` showing **office\ola.nordmann**
-- [ ] ADUC showing PC-IT01 in the Workstations OU
+- [ ] `Get-ADComputer` on DC01 showing all four clients in the Workstations OU
+- [ ] ADUC showing the Workstations OU with four computers
 
 ## Notes
 

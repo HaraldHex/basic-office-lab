@@ -57,6 +57,21 @@ Use this template for each issue:
 - **Fix:** None needed. Verified with `Get-ADOrganizationalUnit`, `Get-ADGroup` and `Get-ADUser` that everything existed once.
 - **Lesson learned:** In PowerShell, right-click alone pastes. Always verify state after running commands instead of assuming from the output.
 
+### Issue #6: Local account had the same name as the computer
+- **Phase:** 07 – Domain join (PC-SALES01)
+- **Symptom:** After installing Windows, the Start menu showed the local user as **PC-SALES01**, the same name the computer was about to get.
+- **Root cause:** During setup the local account was named after the computer. Windows treats user and computer names in the same namespace, so a rename/join to `PC-SALES01` can fail.
+- **Fix:** Renamed the local user before joining: `Rename-LocalUser -Name "PC-SALES01" -NewName "sales01"`.
+- **Lesson learned:** Give the setup account a generic name like `localadmin`.
+
+### Issue #7: "The specified username is invalid" when joining PC-HR01
+- **Phase:** 07 – Domain join (PC-HR01)
+- **Symptom:** `sysdm.cpl` returned *The following error occurred attempting to join the domain "office.lab": The specified username is invalid.*
+- **Investigation:** `nslookup office.lab` was answered by DC01.office.lab, so DNS and network were fine. The problem had to be the credentials typed into the dialog.
+- **Root cause:** The username was not entered in a form Windows accepted (typing error / keyboard layout in the VM).
+- **Fix:** Joined with PowerShell instead, pasting the command from the host so the backslash came through correctly: `Add-Computer -DomainName "office.lab" -NewName "PC-HR01" -Credential "OFFICE\Administrator" -Restart`.
+- **Lesson learned:** Rule out the network first (`nslookup`). If DNS works, a join error is almost always about credentials or naming.
+
 ---
 
 ## Common pitfalls (reference)

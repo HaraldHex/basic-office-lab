@@ -64,11 +64,13 @@ Client gets IP from DHCP → receives DC01 as DNS → finds the domain via SRV r
 | 07 | [Joining clients to the domain](docs/07-domain-join.md) | ✅ |
 | 08 | [Group Policy](docs/08-group-policy.md) | ⬜ |
 | 09 | [File server and permissions](docs/09-file-server.md) | ⬜ |
-| 10 | [Troubleshooting log](docs/10-troubleshooting-log.md) | 🔄 5 issues logged |
+| 10 | [Troubleshooting log](docs/10-troubleshooting-log.md) | 🔄 7 issues logged |
 
 *Replace ⬜ with ✅ as each phase is completed.*
 
 ## Users
+
+All four workstations are joined to `office.lab` and placed in the Workstations OU, each with a department user logged in.
 
 | User | Department | Group | Workstation |
 |---|---|---|---|
@@ -79,7 +81,7 @@ Client gets IP from DHCP → receives DC01 as DNS → finds the domain via SRV r
 
 ## Highlights from troubleshooting
 
-Five real issues were hit and solved during the build, including a misconfigured virtual subnet, a DHCP authorization permission error and a keyboard-layout conflict with VMware. Each is documented with symptom, investigation, root cause and fix in the [troubleshooting log](docs/10-troubleshooting-log.md).
+Seven real issues were hit and solved during the build, including a misconfigured virtual subnet, a DHCP authorization permission error and a keyboard-layout conflict with VMware. Each is documented with symptom, investigation, root cause and fix in the [troubleshooting log](docs/10-troubleshooting-log.md).
 
 ## Scripts
 
